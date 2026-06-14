@@ -1,0 +1,77 @@
+[
+  {
+    "question": "How many white t-shirts are in stock?",
+    "sql": "SELECT SUM(stock) FROM products WHERE colour = 'White' AND category = 'T-Shirt'",
+    "notes": "Aggregates stock across all sizes of white t-shirts"
+  },
+  {
+    "question": "What is the total revenue if all Nike products are sold at full price?",
+    "sql": "SELECT SUM(stock * price) FROM products WHERE name LIKE '%Nike%'",
+    "notes": "Revenue = stock * price, no discount applied"
+  },
+  {
+    "question": "Which products have a discount greater than 20 percent?",
+    "sql": "SELECT name, category, colour, size, discount FROM products WHERE discount > 20",
+    "notes": "Discount is stored as a percentage value"
+  },
+  {
+    "question": "How many products are in the Jeans category?",
+    "sql": "SELECT COUNT(*) FROM products WHERE category = 'Jeans'",
+    "notes": "Counts individual product rows, not distinct products"
+  },
+  {
+    "question": "List all products with less than 25 items in stock",
+    "sql": "SELECT name, colour, size, stock FROM products WHERE stock < 25 ORDER BY stock ASC",
+    "notes": "Ordered from lowest to highest stock"
+  },
+  {
+    "question": "What is the average price of all hoodies?",
+    "sql": "SELECT AVG(price) FROM products WHERE category = 'Hoodie'",
+    "notes": "AVG aggregates over all hoodie rows"
+  },
+  {
+    "question": "Show me all black products available in medium size",
+    "sql": "SELECT name, category, price, stock FROM products WHERE colour = 'Black' AND size = 'M'",
+    "notes": "Filters by both colour and size"
+  },
+  {
+    "question": "What is the most expensive jacket?",
+    "sql": "SELECT name, colour, size, price FROM products WHERE category = 'Jacket' ORDER BY price DESC LIMIT 1",
+    "notes": "LIMIT 1 after descending price sort"
+  },
+  {
+    "question": "How many distinct product names are there?",
+    "sql": "SELECT COUNT(DISTINCT name) FROM products",
+    "notes": "Counts unique product names ignoring colour/size variants"
+  },
+  {
+    "question": "Show total stock by category",
+    "sql": "SELECT category, SUM(stock) AS total_stock FROM products GROUP BY category ORDER BY total_stock DESC",
+    "notes": "GROUP BY category with alias and sort"
+  },
+  {
+    "question": "Which Adidas products are on discount?",
+    "sql": "SELECT name, colour, size, discount FROM products WHERE name LIKE '%Adidas%' AND discount > 0",
+    "notes": "Filters Adidas brand and non-zero discount"
+  },
+  {
+    "question": "What is the cheapest product in the store?",
+    "sql": "SELECT name, category, colour, size, price FROM products ORDER BY price ASC LIMIT 1",
+    "notes": "ASC sort on price with LIMIT 1"
+  },
+  {
+    "question": "List all products available in size XL",
+    "sql": "SELECT name, category, colour, price, stock FROM products WHERE size = 'XL'",
+    "notes": "Filter by size column"
+  },
+  {
+    "question": "What is the total discount value across all products if sold at full stock?",
+    "sql": "SELECT SUM(stock * price * discount / 100.0) AS total_discount_value FROM products",
+    "notes": "discount column is percentage; converts to fraction"
+  },
+  {
+    "question": "Show me all products with no discount",
+    "sql": "SELECT name, category, colour, size, price FROM products WHERE discount = 0 ORDER BY name",
+    "notes": "Exactly zero discount"
+  }
+]

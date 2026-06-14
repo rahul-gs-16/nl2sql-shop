@@ -1,0 +1,48 @@
+# ── NL-to-SQL Analytics Assistant — Docker Compose ─────────────────────────
+#
+# Quick start:
+#   cp .env.example .env        # fill in API keys
+#   docker compose up           # starts app + ollama (if MODEL_PROVIDER=gemma)
+#
+# Cloud-only (no Ollama):
+#   docker compose up app
+# ---------------------------------------------------------------------------
+
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8502:8501"
+    volumes:
+      # Persist the SQLite database between restarts
+      - ./data:/data
+      # Persist ChromaDB vector store between restarts
+      - ./chroma:/chroma
+    env_file:
+      - .env
+    environment:
+      # Override paths to match container mounts
+      SQLITE_DB_PATH: /data/inventory.db
+      CHROMA_PERSIST_DIR: /chroma
+      EXAMPLES_PATH: /data/examples/examples.json
+    depends_on:
+      ollama:
+        condition: service_started
+        required: false
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    profiles:
+      - ollama          # Start only when --profile ollama is passed, OR MODEL_PROVIDER=gemma
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    restart: unless-stopped
+
+volumes:
+  ollama_models:
