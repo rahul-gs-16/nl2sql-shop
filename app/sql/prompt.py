@@ -58,7 +58,12 @@ def build_prompt(
 
     lines += [
         "=== YOUR TASK ===",
-        f"Question: {question}",
+        "You must generate a SQL query to answer the user's current question.",
+        "If there is a 'Recent conversation context' provided, use it STRICTLY to understand what product models, colors, or variants the user is referring to in their current question.",
+        "For example, if the context was discussing the 'iPhone 16 Black' and the current question is 'what storage capacities are available?', your SQL must filter for model='iPhone 16' and color='Black'.",
+        "",
+        f"Input Data:\n{question}",
+        "",
         "SQL:",
     ]
 

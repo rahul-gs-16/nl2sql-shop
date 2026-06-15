@@ -98,6 +98,99 @@ def get_column_names(sql: str) -> list[str]:
         conn.close()
 
 
+from datetime import datetime
+
+def place_order(customer_name: str, contact_number: str, address: str, product_id: int, quantity: int) -> dict:
+    """
+    Place an order for a product, ensuring sufficient stock.
+    This operation is transactional.
+
+    Parameters
+    ----------
+    customer_name : str
+    contact_number : str
+    address : str
+    product_id : int
+    quantity : int
+
+    Returns
+    -------
+    dict
+        A dictionary with 'success' (bool) and 'message' (str).
+    """
+    conn = sqlite3.connect(settings.SQLITE_DB_PATH)
+    try:
+        cursor = conn.cursor()
+        
+        # Start transaction
+        cursor.execute("BEGIN TRANSACTION")
+        
+        # 1. Check stock and get price
+        cursor.execute("SELECT stock, price, model, variant, storage, color FROM products WHERE id = ?", (product_id,))
+        row = cursor.fetchone()
+        
+        if not row:
+            conn.rollback()
+            return {"success": False, "message": f"Product ID {product_id} not found."}
+            
+        stock, price, model, variant, storage, color = row
+        product_name = f"{model} {variant} {storage} {color}"
+        
+        if stock < quantity:
+            conn.rollback()
+            return {
+                "success": False, 
+                "message": f"Insufficient stock for {product_name}. Requested: {quantity}, Available: {stock}."
+            }
+            
+        # 2. Calculate total amount
+        total_amount = price * quantity
+        order_date = datetime.utcnow().isoformat()
+        
+        # 3. Deduct stock
+        cursor.execute(
+            "UPDATE products SET stock = stock - ? WHERE id = ?", 
+            (quantity, product_id)
+        )
+        
+        # 4. Insert order
+        cursor.execute(
+            """
+            INSERT INTO orders (customer_name, contact_number, address, product_id, quantity, total_amount, order_date)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            (customer_name, contact_number, address, product_id, quantity, total_amount, order_date)
+        )
+        
+        # Commit transaction
+        conn.commit()
+        return {
+            "success": True, 
+            "message": f"Successfully ordered {quantity}x {product_name}. Total: ${total_amount:.2f}"
+        }
+        
+    except Exception as e:
+        conn.rollback()
+        return {"success": False, "message": f"An error occurred: {str(e)}"}
+    finally:
+        conn.close()
+
+def clear_orders() -> None:
+    """
+    Clear all records from the orders table.
+    Used to reset the orders database on startup.
+    """
+    conn = sqlite3.connect(settings.SQLITE_DB_PATH)
+    try:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM orders")
+        conn.commit()
+    except Exception as e:
+        # Ignore errors if table doesn't exist yet
+        pass
+    finally:
+        conn.close()
+
 # ---------------------------------------------------------------------------
 # Internal helpers
 # ---------------------------------------------------------------------------

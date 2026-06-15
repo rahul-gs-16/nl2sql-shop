@@ -58,23 +58,23 @@ if ($LASTEXITCODE -ne 0) {
 # persists across container restarts.
 # ------------------------------------------------------------
 Write-Host ""
-Write-Host "Checking if gemma3 model is already downloaded..." -ForegroundColor Yellow
+Write-Host "Checking if gemma4:e4b model is already downloaded..." -ForegroundColor Yellow
 
 $modelList = docker exec shop-ollama-1 ollama list 2>&1
-if ($modelList -notmatch "gemma3") {
+if ($modelList -notmatch "gemma4:e4b") {
     Write-Host ""
-    Write-Host "[First-time setup] Pulling gemma3 model (~5 GB). This may take several minutes..." -ForegroundColor Yellow
+    Write-Host "[First-time setup] Pulling gemma4:e4b model. This may take several minutes..." -ForegroundColor Yellow
     Write-Host "  This only runs once. The model is cached in a Docker volume for future starts." -ForegroundColor DarkGray
     Write-Host ""
-    docker exec shop-ollama-1 ollama pull gemma3
+    docker exec shop-ollama-1 ollama pull gemma4:e4b
     if ($LASTEXITCODE -ne 0) {
-        Write-Host "Failed to pull gemma3 model. Check that the ollama container is running." -ForegroundColor Red
+        Write-Host "Failed to pull gemma4:e4b model. Check that the ollama container is running." -ForegroundColor Red
         exit 1
     }
     Write-Host ""
-    Write-Host "gemma3 model downloaded successfully." -ForegroundColor Green
+    Write-Host "gemma4:e4b model downloaded successfully." -ForegroundColor Green
 } else {
-    Write-Host "gemma3 model already present. Skipping download." -ForegroundColor Green
+    Write-Host "gemma4:e4b model already present. Skipping download." -ForegroundColor Green
 }
 
 # ------------------------------------------------------------
