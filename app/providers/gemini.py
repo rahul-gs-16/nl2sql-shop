@@ -21,7 +21,7 @@ class GeminiProvider(LLMProvider):
 
     def __init__(self) -> None:
         self._llm = ChatGoogleGenerativeAI(
-            model="gemini-1.5-flash",
+            model="gemini-3.5-flash",
             google_api_key=settings.GOOGLE_API_KEY,
             temperature=0,
         )
@@ -42,6 +42,5 @@ class GeminiProvider(LLMProvider):
         str
             The model's plain-text response.
         """
-        llm = self._llm.bind(temperature=temperature)
-        response = llm.invoke([HumanMessage(content=prompt)])
+        response = self._llm.invoke([HumanMessage(content=prompt)])
         return response.content

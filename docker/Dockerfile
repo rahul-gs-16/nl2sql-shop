@@ -15,8 +15,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 # Install Python dependencies first (layer-cache friendly)
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# REQUIREMENTS_FILE can be overridden at build time (e.g. requirements_cpu.txt)
+ARG REQUIREMENTS_FILE=requirements.txt
+COPY requirements.txt requirements_cpu.txt ./
+RUN pip install --no-cache-dir -r ${REQUIREMENTS_FILE}
 
 # Copy application source
 COPY app/ ./app/
