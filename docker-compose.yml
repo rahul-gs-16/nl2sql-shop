@@ -11,6 +11,7 @@
 services:
 
   app:
+    image: nl2sql-shop-app:istore
     build:
       context: .
       dockerfile: docker/Dockerfile

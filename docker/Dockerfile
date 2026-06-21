@@ -1,5 +1,5 @@
 # ── NL-to-SQL Analytics Assistant ─────────────────────────────────────────
-# Build:   docker build -f docker/Dockerfile -t nl-sql-app .
+# Build:   docker build -f docker/Dockerfile -t nl2sql-shop-app:istore .
 # Run:     docker compose up
 # ---------------------------------------------------------------------------
 
@@ -14,7 +14,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Working directory inside the container
 WORKDIR /app
 
-# Install Python dependencies first (layer-cache friendly)
+# Install CPU-only torch before other deps so sentence-transformers
+# does not pull in CUDA wheels (saves ~3 GB in the image)
+RUN pip install --no-cache-dir \
+    torch==2.6.0+cpu \
+    --index-url https://download.pytorch.org/whl/cpu
+
+# Install remaining Python dependencies (layer-cache friendly)
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
